@@ -1,0 +1,15 @@
+{
+  "name": "Auron Studio Mobile",
+  "short_name": "Auron",
+  "description": "Compositor de arte em gradiente para acrílico retroiluminado — byauron.art",
+  "start_url": "./auron-mobile.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06080c",
+  "theme_color": "#06080c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
