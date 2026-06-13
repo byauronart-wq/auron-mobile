@@ -202,6 +202,19 @@
         <option value="in-out">Centro → fora</option><option value="out-in">Fora → centro</option><option value="linear">Linear</option>
       </select></div>
 
+    <div data-types="blob">
+      <div class="lbl">Preenchimento</div>
+      <div class="chips">
+        <button class="chip" id="rm_smooth" onclick="setRM('smooth')">Suave</button>
+        <button class="chip" id="rm_solid"  onclick="setRM('solid')">Sólido</button>
+        <button class="chip" id="rm_rings"  onclick="setRM('rings')">Anéis</button>
+      </div>
+      <div id="ringsControls" hidden>
+        <div class="row"><span class="name">Nº anéis</span><input type="range" min="2" max="24" id="p_ringsCount" data-prop="ringsCount"><span class="val"></span></div>
+        <div class="row"><span class="name">Suavid. anéis</span><input type="range" min="0" max="30" id="p_ringsSoft" data-prop="ringsSoft"><span class="val"></span></div>
+      </div>
+    </div>
+
     <div data-types="caustic">
       <div class="lbl">Cáusticas</div>
       <div class="row"><span class="name">Escala</span><input type="range" min="5" max="100" id="p_causticScale" data-prop="causticScale"><span class="val"></span></div>
@@ -553,7 +566,7 @@ function toggleVis(){const L=layers.find(l=>l.id===activeId);if(!L)return;L.visi
 function soloActive(){const L=act();if(!L)return;toggleSolo(L.id);renderEdit();}
 
 // ═══ EDITAR ═══
-const PROP_SLIDERS=['sizeX','sizeY','posX','posY','core','rotate','ringWidth','noise','blur','opacity','causticScale','causticContrast','causticComplexity','perlinScale','gridSize','gridThickness','displaceStrength','imgBrightness','imgContrast','imgSaturation','fxMotionBlur','fxMotionAngle','fxHalftone','fxGlitch','fxChroma'];
+const PROP_SLIDERS=['sizeX','sizeY','posX','posY','core','rotate','ringWidth','noise','blur','opacity','causticScale','causticContrast','causticComplexity','perlinScale','gridSize','gridThickness','displaceStrength','imgBrightness','imgContrast','imgSaturation','fxMotionBlur','fxMotionAngle','fxHalftone','fxGlitch','fxChroma','ringsCount','ringsSoft'];
 function wireEdit(){
   PROP_SLIDERS.forEach(p=>{
     const s=el('p_'+p);if(!s)return;
@@ -593,6 +606,7 @@ function renderEdit(){
   ['causticColor','perlinColor1','perlinColor2','gridColor'].forEach(p=>{const c=el('p_'+p);if(c&&/^#[0-9a-f]{6}$/i.test(L[p]||''))c.value=L[p];});
   el('dispBtn').textContent=L.displaceEnabled?'ON':'OFF';
   el('dispBtn').classList.toggle('on',!!L.displaceEnabled);
+  if(L.type==='blob')syncRMChips(L);
   renderColorStops(L);
 }
 function renderColorStops(L){
@@ -611,6 +625,14 @@ function renderColorStops(L){
 }
 function setGradPreset(g){const L=act();if(!L)return;saveUndo();L.colors=[...g.colors];renderColorStops(L);renderLayList();render();}
 function setShape(s){const L=act();if(!L)return;L.fshape=s;document.querySelectorAll('#shapeChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===s));render();}
+function setRM(mode){const L=act();if(!L||L.type!=='blob')return;saveUndo();L.ringsMode=mode==='rings';L.solidFill=mode==='solid';syncRMChips(L);render();}
+function syncRMChips(L){
+  const mode=L.ringsMode?'rings':L.solidFill?'solid':'smooth';
+  ['smooth','solid','rings'].forEach(m=>el('rm_'+m)?.classList.toggle('on',m===mode));
+  const rc=el('ringsControls');if(rc)rc.hidden=!L.ringsMode;
+  // sync slider vals manualmente porque podem estar hidden no PROP_SLIDERS pass
+  ['ringsCount','ringsSoft'].forEach(p=>{const s=el('p_'+p);if(!s)return;s.value=L[p]??( p==='ringsCount'?5:6);const v=s.parentElement.querySelector('.val');if(v)v.textContent=s.value;});
+}
 function toggleDisp(){
   const L=act();if(!L||L.type!=='grid')return;saveUndo();
   L.displaceEnabled=!L.displaceEnabled;
