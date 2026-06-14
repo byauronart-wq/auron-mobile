@@ -1,5 +1,10 @@
 // AURON ENGINE — extraído de auron-studio-v9.html (cópia; o desktop continua independente)
 // Requer globals definidos pela app: el(), canvas, uid, layers. Gerado 2026-06-12.
+// Detecção de suporte a canvas filter (Safari iOS < 18 não suporta)
+const _fSupp=(()=>{try{const c=document.createElement('canvas');c.width=c.height=7;const x=c.getContext('2d');x.filter='blur(2px)';x.fillStyle='red';x.fillRect(3,3,1,1);return x.getImageData(1,3,1,1).data[0]>5;}catch(e){return false;}})();
+// Box blur por software (3 passes ≈ gaussiano) — fallback para iOS < 18
+function _swBlur(ctx,w,h,r){if(r<1)return;const k=1/(r*2+1);for(let p=0;p<3;p++){const id=ctx.getImageData(0,0,w,h),s=new Uint8ClampedArray(id.data),d=id.data;for(let y=0;y<h;y++)for(let c=0;c<4;c++){let sm=s[y*w*4+c]*(r+1);for(let x=0;x<r;x++)sm+=s[(y*w+x)*4+c];for(let x=0;x<w;x++){sm+=s[(y*w+Math.min(x+r,w-1))*4+c]-s[(y*w+Math.max(x-r-1,0))*4+c];d[(y*w+x)*4+c]=sm*k;}}ctx.putImageData(id,0,0);const id2=ctx.getImageData(0,0,w,h),s2=new Uint8ClampedArray(id2.data),d2=id2.data;for(let x=0;x<w;x++)for(let c=0;c<4;c++){let sm=s2[x*4+c]*(r+1);for(let y=0;y<r;y++)sm+=s2[(y*w+x)*4+c];for(let y=0;y<h;y++){sm+=s2[(Math.min(y+r,h-1)*w+x)*4+c]-s2[(Math.max(y-r-1,0)*w+x)*4+c];d2[(y*w+x)*4+c]=sm*k;}}ctx.putImageData(id2,0,0);}}
+
 const hexRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 const hexA=(h,a)=>{if(!h||h.length<7)return`rgba(128,128,128,${a})`;const[r,g,b]=hexRGB(h);return`rgba(${r},${g},${b},${a})`;};
 const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
@@ -206,8 +211,10 @@ function drawBlob(oc,L,cw,ch){
   if(blurPx>.5){
     const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;
     const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;const bctx=bf.getContext('2d');
-    bctx.filter=`blur(${blurPx}px)`;bctx.drawImage(tmp,pad,pad); // halo desfocado
-    bctx.filter='none';bctx.drawImage(tmp,pad,pad);               // núcleo nítido por cima
+    bctx.drawImage(tmp,pad,pad);
+    if(_fSupp){const t=document.createElement('canvas');t.width=bw;t.height=bw;const tc=t.getContext('2d');tc.filter=`blur(${blurPx}px)`;tc.drawImage(bf,0,0);bctx.clearRect(0,0,bw,bw);bctx.drawImage(t,0,0);}
+    else{_swBlur(bctx,bw,bw,Math.max(1,Math.round(blurPx*0.42)));}
+    bctx.drawImage(tmp,pad,pad); // núcleo nítido por cima para preservar brilho
     oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
   } else oc.drawImage(tmp,cx-tS/2,cy-tS/2,tS,tS);
 }
@@ -236,7 +243,9 @@ function drawRing(oc,L,cw,ch){
   if(isLin){const ep=getLinearEndpoints(L,tS,tS,hc,hc);grad=rc.createLinearGradient(ep.x0,ep.y0,ep.x1,ep.y1);L.colors.forEach((c,i)=>grad.addColorStop(i/Math.max(1,L.colors.length-1),c));}
   else{grad=rc.createRadialGradient(hc,hc,innerR*.85,hc,hc,baseR);const cs=invert?[...L.colors].reverse():L.colors;cs.forEach((c,i)=>grad.addColorStop(i/(cs.length-1),c));}
   rc.fillStyle=grad;rc.fillRect(0,0,tS,tS);rc.globalCompositeOperation='destination-in';rc.drawImage(oC,0,0);
-  const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;bf.getContext('2d').filter=`blur(${blurPx}px)`;bf.getContext('2d').drawImage(rf,pad,pad);
+  const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;const bctxR=bf.getContext('2d');bctxR.drawImage(rf,pad,pad);
+  if(_fSupp){const t=document.createElement('canvas');t.width=bw;t.height=bw;const tc=t.getContext('2d');tc.filter=`blur(${blurPx}px)`;tc.drawImage(bf,0,0);bctxR.clearRect(0,0,bw,bw);bctxR.drawImage(t,0,0);}
+  else{_swBlur(bctxR,bw,bw,Math.max(1,Math.round(blurPx*0.42)));}
   oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
 }
 
@@ -879,12 +888,12 @@ function drawLayerToCanvas(L,cw,ch){
     for(let i=3;i<d.length;i+=4)d[i]=cl(d[i]*f);oc.putImageData(id,0,0);
   }
   if(L.warpData)off=applyWarp(off,L,cw,ch);
-  // blur geral da camada (CSS filter no offscreen — funciona para todos os tipos)
+  // blur geral da camada — funciona para todos os tipos excepto blob/ring (que tratam internamente)
   if(L.blur>0&&L.type!=='blob'&&L.type!=='ring'){
     const blurPx=L.blur*Math.min(cw,ch)/300;
-    const blurred=document.createElement('canvas');blurred.width=cw;blurred.height=ch;
-    const bc=blurred.getContext('2d');bc.filter=`blur(${blurPx}px)`;bc.drawImage(off,0,0);
-    const oc2=off.getContext('2d');oc2.clearRect(0,0,cw,ch);oc2.drawImage(blurred,0,0);
+    const oc2=off.getContext('2d');
+    if(_fSupp){const blurred=document.createElement('canvas');blurred.width=cw;blurred.height=ch;blurred.getContext('2d').filter=`blur(${blurPx}px)`;blurred.getContext('2d').drawImage(off,0,0);oc2.clearRect(0,0,cw,ch);oc2.drawImage(blurred,0,0);}
+    else{_swBlur(oc2,cw,ch,Math.max(1,Math.round(blurPx*0.42)));}
   }
   // aplicar máscara de luminosidade se existir
   if(L._mask)applyLayerMask(off,L,cw,ch);
