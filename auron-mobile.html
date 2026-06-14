@@ -83,6 +83,8 @@
   input[type=color]{width:38px;height:32px;border:1px solid var(--b2);border-radius:7px;background:none;padding:2px;flex-shrink:0}
   .stopx{background:var(--p1);border:1px solid var(--b2);color:var(--m1);border-radius:7px;width:32px;height:32px;font-size:13px}
   .hint{font-size:10px;color:var(--m1);line-height:1.55;margin-bottom:12px}
+  .dtgt{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);padding:7px 2px}
+  .dtgt input{width:18px;height:18px;accent-color:var(--ac,#ffb347);flex:none}
   select{background:var(--p1);color:var(--t1);border:1px solid var(--b2);border-radius:7px;padding:9px;font-size:12px;flex:1;min-width:0}
   input[type=file]{display:none}
   input[type=number]{background:var(--p1);color:var(--t1);border:1px solid var(--b2);border-radius:7px;padding:8px;font-size:13px;width:64px}
@@ -123,7 +125,9 @@
 
 <!-- CENA -->
 <div class="sheet" id="sheet-cena">
-  <div class="lbl">Cenas</div>
+  <div class="lbl">Projeto</div>
+  <div class="chips"><button class="chip" onclick="newProject()">＋ Novo (vazio)</button></div>
+  <div class="lbl">Cenas (modelos)</div>
   <div class="chips" id="sceneChips"></div>
   <div class="lbl">Formato do produto</div>
   <div class="chips" id="fmtChips"></div>
@@ -217,29 +221,44 @@
 
     <div data-types="caustic">
       <div class="lbl">Cáusticas</div>
-      <div class="row"><span class="name">Escala</span><input type="range" min="5" max="100" id="p_causticScale" data-prop="causticScale"><span class="val"></span></div>
-      <div class="row"><span class="name">Contraste</span><input type="range" min="0" max="100" id="p_causticContrast" data-prop="causticContrast"><span class="val"></span></div>
+      <div class="row"><span class="name">Escala</span><input type="range" min="5" max="300" id="p_causticScale" data-prop="causticScale"><span class="val"></span></div>
       <div class="row"><span class="name">Complexid.</span><input type="range" min="1" max="8" id="p_causticComplexity" data-prop="causticComplexity"><span class="val"></span></div>
-      <div class="row"><span class="name">Cor</span><input type="color" id="p_causticColor"></div>
+      <div class="row"><span class="name">Contraste</span><input type="range" min="0" max="100" id="p_causticContrast" data-prop="causticContrast"><span class="val"></span></div>
+      <div class="row"><span class="name">Direcção</span><input type="range" min="0" max="360" id="p_causticFlow" data-prop="causticFlow"><span class="val"></span></div>
+      <div class="row"><span class="name">Turbulência</span><input type="range" min="0" max="100" id="p_causticTurbulence" data-prop="causticTurbulence"><span class="val"></span></div>
+      <div class="row"><span class="name">Cor da luz</span><input type="color" id="p_causticColor"></div>
     </div>
     <div data-types="perlin">
       <div class="lbl">Perlin</div>
-      <div class="row"><span class="name">Escala</span><input type="range" min="5" max="150" id="p_perlinScale" data-prop="perlinScale"><span class="val"></span></div>
       <div class="row"><span class="name">Tipo</span>
         <select id="p_perlinType"><option value="normal">Normal</option><option value="turbulence">Turbulência</option><option value="ridged">Cristas</option><option value="marble">Mármore</option><option value="wood">Madeira</option></select></div>
+      <div class="row"><span class="name">Escala</span><input type="range" min="5" max="400" id="p_perlinScale" data-prop="perlinScale"><span class="val"></span></div>
+      <div class="row"><span class="name">Escala X</span><input type="range" min="20" max="400" id="p_perlinScaleX" data-prop="perlinScaleX"><span class="val"></span></div>
+      <div class="row"><span class="name">Escala Y</span><input type="range" min="20" max="400" id="p_perlinScaleY" data-prop="perlinScaleY"><span class="val"></span></div>
+      <div class="row"><span class="name">Oitavas</span><input type="range" min="1" max="8" id="p_perlinOctaves" data-prop="perlinOctaves"><span class="val"></span></div>
+      <div class="row"><span class="name">Persist.</span><input type="range" min="10" max="90" id="p_perlinPersist" data-prop="perlinPersist"><span class="val"></span></div>
+      <div class="row"><span class="name">Warp domínio</span><input type="range" min="0" max="100" id="p_perlinDomain" data-prop="perlinDomain"><span class="val"></span></div>
+      <div class="row"><span class="name">Escala warp</span><input type="range" min="5" max="200" id="p_perlinDomainScale" data-prop="perlinDomainScale"><span class="val"></span></div>
+      <div class="row"><span class="name">Rotação</span><input type="range" min="0" max="360" id="p_perlinRotate" data-prop="perlinRotate"><span class="val"></span></div>
       <div class="row"><span class="name">Cor 1</span><input type="color" id="p_perlinColor1"><span class="name" style="width:auto">Cor 2</span><input type="color" id="p_perlinColor2"></div>
     </div>
     <div data-types="grid">
       <div class="lbl">Grid</div>
       <div class="row"><span class="name">Tipo</span>
         <select id="p_gridType"><option value="cross">Cruzado</option><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option><option value="diagonal">Diagonal</option><option value="dots">Pontos</option><option value="concentric">Concêntrico</option><option value="spiral">Espiral</option><option value="radial">Radial</option></select></div>
-      <div class="row"><span class="name">Tamanho</span><input type="range" min="2" max="80" id="p_gridSize" data-prop="gridSize"><span class="val"></span></div>
-      <div class="row"><span class="name">Espessura</span><input type="range" min="1" max="10" id="p_gridThickness" data-prop="gridThickness"><span class="val"></span></div>
+      <div class="row"><span class="name">Espaçamento</span><input type="range" min="4" max="300" id="p_gridSize" data-prop="gridSize"><span class="val"></span></div>
+      <div class="row"><span class="name">Espessura</span><input type="range" min="1" max="12" id="p_gridThickness" data-prop="gridThickness"><span class="val"></span></div>
+      <div class="row" id="gridAngleRow"><span class="name">Ângulo</span><input type="range" min="0" max="360" id="p_gridAngle" data-prop="gridAngle"><span class="val"></span></div>
       <div class="row"><span class="name">Cor</span><input type="color" id="p_gridColor"></div>
-      <div class="row"><span class="name">Distorcer ↓</span>
-        <button class="chip" id="dispBtn" onclick="toggleDisp()">OFF</button>
-        <input type="range" min="1" max="60" id="p_displaceStrength" data-prop="displaceStrength" style="flex:1"><span class="val"></span></div>
-      <div class="hint">“Distorcer ↓” aplica esta grid como distorção à camada imediatamente abaixo (efeito vidro estriado).</div>
+    </div>
+    <div data-types="caustic perlin grid noise" id="dispSec">
+      <div class="lbl">Distorcer camadas</div>
+      <div class="chips"><button class="chip" id="dispToggle" onclick="toggleDispMulti()">OFF</button></div>
+      <div id="dispBody">
+        <div class="hint">Escolhe que camadas esta distorce (efeito vidro/refracção):</div>
+        <div id="dispTargets"></div>
+        <div class="row"><span class="name">Intensidade</span><input type="range" min="1" max="120" id="p_displaceStrength" data-prop="displaceStrength"><span class="val"></span></div>
+      </div>
     </div>
     <div data-types="image">
       <div class="lbl">Imagem</div>
@@ -566,7 +585,7 @@ function toggleVis(){const L=layers.find(l=>l.id===activeId);if(!L)return;L.visi
 function soloActive(){const L=act();if(!L)return;toggleSolo(L.id);renderEdit();}
 
 // ═══ EDITAR ═══
-const PROP_SLIDERS=['sizeX','sizeY','posX','posY','core','rotate','ringWidth','noise','blur','opacity','causticScale','causticContrast','causticComplexity','perlinScale','gridSize','gridThickness','displaceStrength','imgBrightness','imgContrast','imgSaturation','fxMotionBlur','fxMotionAngle','fxHalftone','fxGlitch','fxChroma','ringsCount','ringsSoft'];
+const PROP_SLIDERS=['sizeX','sizeY','posX','posY','core','rotate','ringWidth','noise','blur','opacity','causticScale','causticContrast','causticComplexity','causticFlow','causticTurbulence','perlinScale','perlinScaleX','perlinScaleY','perlinOctaves','perlinPersist','perlinDomain','perlinDomainScale','perlinRotate','gridSize','gridThickness','gridAngle','displaceStrength','imgBrightness','imgContrast','imgSaturation','fxMotionBlur','fxMotionAngle','fxHalftone','fxGlitch','fxChroma','ringsCount','ringsSoft'];
 function wireEdit(){
   PROP_SLIDERS.forEach(p=>{
     const s=el('p_'+p);if(!s)return;
@@ -578,7 +597,7 @@ function wireEdit(){
   el('p_blend').addEventListener('change',e=>{const L=act();if(L){L.blend=e.target.value;render();}});
   el('p_gradDir').addEventListener('change',e=>{const L=act();if(L){L.gradDir=e.target.value;render();}});
   el('p_perlinType').addEventListener('change',e=>{const L=act();if(L){L.perlinType=e.target.value;render();}});
-  el('p_gridType').addEventListener('change',e=>{const L=act();if(L){L.gridType=e.target.value;render();}});
+  el('p_gridType').addEventListener('change',e=>{const L=act();if(L){L.gridType=e.target.value;const gar=el('gridAngleRow');if(gar)gar.hidden=['concentric','spiral','radial'].includes(L.gridType);render();}});
   ['causticColor','perlinColor1','perlinColor2','gridColor'].forEach(p=>{
     el('p_'+p).addEventListener('input',e=>{const L=act();if(L){L[p]=e.target.value;render();}});
   });
@@ -604,10 +623,25 @@ function renderEdit(){
   el('p_blend').value=L.blend;el('p_gradDir').value=L.gradDir||'in-out';
   el('p_perlinType').value=L.perlinType||'normal';el('p_gridType').value=L.gridType||'cross';
   ['causticColor','perlinColor1','perlinColor2','gridColor'].forEach(p=>{const c=el('p_'+p);if(c&&/^#[0-9a-f]{6}$/i.test(L[p]||''))c.value=L[p];});
-  el('dispBtn').textContent=L.displaceEnabled?'ON':'OFF';
-  el('dispBtn').classList.toggle('on',!!L.displaceEnabled);
+  // ângulo de grid só faz sentido em padrões lineares
+  if(L.type==='grid'){const gar=el('gridAngleRow');if(gar)gar.hidden=['concentric','spiral','radial'].includes(L.gridType||'cross');}
+  // secção de distorção (caustic/perlin/grid/noise)
+  if(['caustic','perlin','grid','noise'].includes(L.type))renderDispTargets(L);
   if(L.type==='blob')syncRMChips(L);
   renderColorStops(L);
+}
+function renderDispTargets(L){
+  el('dispToggle').textContent=L.displaceEnabled?'ON':'OFF';
+  el('dispToggle').classList.toggle('on',!!L.displaceEnabled);
+  el('dispBody').style.display=L.displaceEnabled?'':'none';
+  const box=el('dispTargets');box.innerHTML='';
+  layers.filter(l=>l.id!==L.id).forEach(t=>{
+    const lab=document.createElement('label');lab.className='dtgt';
+    const cb=document.createElement('input');cb.type='checkbox';cb.checked=L.displaceTargets.includes(t.id);
+    cb.onchange=()=>{saveUndo();if(cb.checked){if(!L.displaceTargets.includes(t.id))L.displaceTargets.push(t.id);}else L.displaceTargets=L.displaceTargets.filter(x=>x!==t.id);render();};
+    lab.append(cb,document.createTextNode(' '+t.name));box.appendChild(lab);
+  });
+  if(!layers.filter(l=>l.id!==L.id).length)box.innerHTML='<div class="hint">Adiciona outra camada para a poder distorcer.</div>';
 }
 function renderColorStops(L){
   const box=el('colorStops');box.innerHTML='';
@@ -633,14 +667,23 @@ function syncRMChips(L){
   // sync slider vals manualmente porque podem estar hidden no PROP_SLIDERS pass
   ['ringsCount','ringsSoft'].forEach(p=>{const s=el('p_'+p);if(!s)return;s.value=L[p]??( p==='ringsCount'?5:6);const v=s.parentElement.querySelector('.val');if(v)v.textContent=s.value;});
 }
-function toggleDisp(){
-  const L=act();if(!L||L.type!=='grid')return;saveUndo();
+function toggleDispMulti(){
+  const L=act();if(!L||!['caustic','perlin','grid','noise'].includes(L.type))return;saveUndo();
   L.displaceEnabled=!L.displaceEnabled;
-  if(L.displaceEnabled){
+  // ao ligar pela primeira vez sem alvos, sugere a camada imediatamente abaixo
+  if(L.displaceEnabled&&!L.displaceTargets.length){
     const idx=layers.findIndex(l=>l.id===L.id);
-    L.displaceTargets=idx>0?[layers[idx-1].id]:[];
-  } else L.displaceTargets=[];
+    if(idx>0)L.displaceTargets=[layers[idx-1].id];
+  }
+  if(!L.displaceEnabled)L.displaceTargets=[];
   renderEdit();render();
+}
+function newProject(){
+  saveUndo();
+  soloId=null;updateSoloHint();
+  layers=[];activeId=null;
+  document.querySelectorAll('#sceneChips .chip').forEach(c=>c.classList.remove('on'));
+  renderLayList();renderEdit();render();
 }
 
 // ═══ DRAG NA CANVAS (mover camada activa) ═══
@@ -824,10 +867,9 @@ function build(){
 }
 window.addEventListener('load',()=>{
   build();
-  layers=instantiateScene('aura');el('bgCol').value=SCENE_BG.aura;
-  activeId=layers[layers.length-1].id;
+  layers=[];activeId=null;       // projeto novo começa vazio
+  renderLayList();renderEdit();
   setupCanvas();
-  el('dragHint').hidden=false;setTimeout(()=>el('dragHint').hidden=true,4000);
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 });
 window.addEventListener('resize',setupCanvas);

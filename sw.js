@@ -1,5 +1,5 @@
 // Auron Mobile — service worker (offline após o primeiro carregamento)
-const CACHE = 'auron-mobile-v2';
+const CACHE = 'auron-mobile-v3';
 const ASSETS = [
   './auron-mobile.html',
   './engine.js',
