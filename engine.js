@@ -190,7 +190,9 @@ function drawBlob(oc,L,cw,ch){
       const rC=document.createElement('canvas');rC.width=tS;rC.height=tS;const rc=rC.getContext('2d');
       rc.save();rc.translate(hc,hc);rc.rotate(L.rotate*Math.PI/180);rc.transform(1,L.skewY/100,L.skewX/100,1,0,0);
       rc.scale(ringR*sN*ax,ringR*sN*ay);drawSP(rc,pts);rc.restore();rc.fillStyle=`rgb(${cl(r)},${cl(g)},${cl(b)})`;rc.fill();
-      const bC=document.createElement('canvas');bC.width=tS;bC.height=tS;bC.getContext('2d').filter=`blur(${softPx}px)`;bC.getContext('2d').drawImage(rC,0,0);
+      const bC=document.createElement('canvas');bC.width=tS;bC.height=tS;const bCtx=bC.getContext('2d');
+      if(_fSupp){bCtx.filter=`blur(${softPx}px)`;bCtx.drawImage(rC,0,0);}
+      else{bCtx.drawImage(rC,0,0);_swBlur(bCtx,tS,tS,Math.max(1,Math.round(softPx*0.42)));}
       tc.globalAlpha=(L.core/100)*.85*(1-t*.2);tc.drawImage(bC,0,0);
     }
     tc.globalAlpha=1;
@@ -362,8 +364,9 @@ function applyExtrude(oc,L,cw,ch,drawFn){
     // ── BLUR HERDADO ────────────────────────────────────────────────────────
     if(L.blur>0){
       const blurPx=L.blur*Math.min(cw,ch)/300;
-      const bf=document.createElement('canvas');bf.width=cw;bf.height=ch;
-      bf.getContext('2d').filter=`blur(${blurPx}px)`;bf.getContext('2d').drawImage(offC,0,0);
+      const bf=document.createElement('canvas');bf.width=cw;bf.height=ch;const bfc=bf.getContext('2d');
+      if(_fSupp){bfc.filter=`blur(${blurPx}px)`;bfc.drawImage(offC,0,0);}
+      else{bfc.drawImage(offC,0,0);_swBlur(bfc,cw,ch,Math.max(1,Math.round(blurPx*0.42)));}
       ec.globalAlpha=layerAlpha;ec.drawImage(bf,0,0);
     } else {
       ec.globalAlpha=layerAlpha;ec.drawImage(offC,0,0);
