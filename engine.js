@@ -203,8 +203,13 @@ function drawBlob(oc,L,cw,ch){
   }
   tc.globalAlpha=1;
   const blurPx=Math.max(0,L.blur*Math.min(cw,ch)/300);
-  if(blurPx>.5){const bf=document.createElement('canvas');bf.width=tS;bf.height=tS;bf.getContext('2d').filter=`blur(${blurPx}px)`;bf.getContext('2d').drawImage(tmp,0,0);oc.drawImage(bf,cx-tS/2,cy-tS/2,tS,tS);}
-  else oc.drawImage(tmp,cx-tS/2,cy-tS/2,tS,tS);
+  if(blurPx>.5){
+    const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;
+    const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;const bctx=bf.getContext('2d');
+    bctx.filter=`blur(${blurPx}px)`;bctx.drawImage(tmp,pad,pad); // halo desfocado
+    bctx.filter='none';bctx.drawImage(tmp,pad,pad);               // núcleo nítido por cima
+    oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
+  } else oc.drawImage(tmp,cx-tS/2,cy-tS/2,tS,tS);
 }
 
 // ═══ DRAW RING ════════════════════════════════════════════════════════════════
@@ -231,8 +236,8 @@ function drawRing(oc,L,cw,ch){
   if(isLin){const ep=getLinearEndpoints(L,tS,tS,hc,hc);grad=rc.createLinearGradient(ep.x0,ep.y0,ep.x1,ep.y1);L.colors.forEach((c,i)=>grad.addColorStop(i/Math.max(1,L.colors.length-1),c));}
   else{grad=rc.createRadialGradient(hc,hc,innerR*.85,hc,hc,baseR);const cs=invert?[...L.colors].reverse():L.colors;cs.forEach((c,i)=>grad.addColorStop(i/(cs.length-1),c));}
   rc.fillStyle=grad;rc.fillRect(0,0,tS,tS);rc.globalCompositeOperation='destination-in';rc.drawImage(oC,0,0);
-  const bf=document.createElement('canvas');bf.width=tS;bf.height=tS;bf.getContext('2d').filter=`blur(${blurPx}px)`;bf.getContext('2d').drawImage(rf,0,0);
-  oc.drawImage(bf,cx-tS/2,cy-tS/2,tS,tS);
+  const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;bf.getContext('2d').filter=`blur(${blurPx}px)`;bf.getContext('2d').drawImage(rf,pad,pad);
+  oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
 }
 
 // ═══ DRAW VEIL ════════════════════════════════════════════════════════════════
