@@ -109,7 +109,7 @@
 <body>
 
 <div class="top">
-  <div class="brand">A<em>U</em>RON</div>
+  <div class="brand">A<em>U</em>RON <span id="ver" style="font-size:9px;letter-spacing:.1em;color:var(--m1);font-weight:400"></span></div>
   <div class="sp"></div>
   <button class="tbtn" id="undoBtn" onclick="undo()" disabled>↩︎</button>
   <button class="tbtn" id="bkBtn" onclick="toggleBacklight()">💡</button>
@@ -865,8 +865,11 @@ function build(){
   Object.entries(SHAPE_LIST).forEach(([s,n])=>{const b=document.createElement('button');b.className='chip';b.dataset.s=s;b.textContent=n;b.onclick=()=>setShape(s);sh.appendChild(b);});
   wireEdit();
 }
+const BUILD='v4';
 window.addEventListener('load',()=>{
   build();
+  // carimbo de versão + modo de blur (sw = software blur ativo p/ iOS antigo)
+  const ver=el('ver');if(ver)ver.textContent=BUILD+(typeof _fSupp!=='undefined'&&!_fSupp?' · sw-blur':'');
   layers=[];activeId=null;       // projeto novo começa vazio
   renderLayList();renderEdit();
   setupCanvas();

@@ -1,5 +1,6 @@
-// Auron Mobile — service worker (offline após o primeiro carregamento)
-const CACHE = 'auron-mobile-v3';
+// Auron Mobile — service worker
+// network-first para TUDO (online = sempre a versão mais recente; offline = cache)
+const CACHE = 'auron-mobile-v4';
 const ASSETS = [
   './auron-mobile.html',
   './engine.js',
@@ -20,24 +21,14 @@ self.addEventListener('activate', e => {
   );
 });
 
-// network-first para o HTML (apanha updates), cache-first para o resto
+// network-first: tenta a rede primeiro (apanha updates), cai para cache só se offline
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  if (url.pathname.endsWith('auron-mobile.html') || url.pathname.endsWith('/')) {
-    e.respondWith(
-      fetch(e.request).then(r => {
-        const copy = r.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
-        return r;
-      }).catch(() => caches.match(e.request).then(r => r || caches.match('./auron-mobile.html')))
-    );
-  } else {
-    e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-        const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
-        return resp;
-      }))
-    );
-  }
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).then(r => {
+      const copy = r.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy));
+      return r;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('./auron-mobile.html')))
+  );
 });

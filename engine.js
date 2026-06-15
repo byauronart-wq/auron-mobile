@@ -1,7 +1,7 @@
 // AURON ENGINE — extraído de auron-studio-v9.html (cópia; o desktop continua independente)
 // Requer globals definidos pela app: el(), canvas, uid, layers. Gerado 2026-06-12.
 // Detecção de suporte a canvas filter (Safari iOS < 18 não suporta)
-const _fSupp=(()=>{try{const c=document.createElement('canvas');c.width=c.height=7;const x=c.getContext('2d');x.filter='blur(2px)';x.fillStyle='red';x.fillRect(3,3,1,1);return x.getImageData(1,3,1,1).data[0]>5;}catch(e){return false;}})();
+var _fSupp=(()=>{try{const c=document.createElement('canvas');c.width=c.height=7;const x=c.getContext('2d');x.filter='blur(2px)';x.fillStyle='red';x.fillRect(3,3,1,1);return x.getImageData(1,3,1,1).data[0]>5;}catch(e){return false;}})();
 // Box blur por software (3 passes ≈ gaussiano) — fallback para iOS < 18
 function _swBlur(ctx,w,h,r){if(r<1)return;const k=1/(r*2+1);for(let p=0;p<3;p++){const id=ctx.getImageData(0,0,w,h),s=new Uint8ClampedArray(id.data),d=id.data;for(let y=0;y<h;y++)for(let c=0;c<4;c++){let sm=s[y*w*4+c]*(r+1);for(let x=0;x<r;x++)sm+=s[(y*w+x)*4+c];for(let x=0;x<w;x++){sm+=s[(y*w+Math.min(x+r,w-1))*4+c]-s[(y*w+Math.max(x-r-1,0))*4+c];d[(y*w+x)*4+c]=sm*k;}}ctx.putImageData(id,0,0);const id2=ctx.getImageData(0,0,w,h),s2=new Uint8ClampedArray(id2.data),d2=id2.data;for(let x=0;x<w;x++)for(let c=0;c<4;c++){let sm=s2[x*4+c]*(r+1);for(let y=0;y<r;y++)sm+=s2[(y*w+x)*4+c];for(let y=0;y<h;y++){sm+=s2[(Math.min(y+r,h-1)*w+x)*4+c]-s2[(Math.max(y-r-1,0)*w+x)*4+c];d2[(y*w+x)*4+c]=sm*k;}}ctx.putImageData(id2,0,0);}}
 
