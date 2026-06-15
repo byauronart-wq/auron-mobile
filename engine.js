@@ -192,7 +192,7 @@ function drawBlob(oc,L,cw,ch){
       rc.scale(ringR*sN*ax,ringR*sN*ay);drawSP(rc,pts);rc.restore();rc.fillStyle=`rgb(${cl(r)},${cl(g)},${cl(b)})`;rc.fill();
       const bC=document.createElement('canvas');bC.width=tS;bC.height=tS;const bCtx=bC.getContext('2d');
       if(_fSupp){bCtx.filter=`blur(${softPx}px)`;bCtx.drawImage(rC,0,0);}
-      else{bCtx.drawImage(rC,0,0);_swBlur(bCtx,tS,tS,Math.max(1,Math.round(softPx*0.42)));}
+      else{bCtx.drawImage(rC,0,0);_swBlur(bCtx,tS,tS,Math.max(1,Math.round(softPx)));}
       tc.globalAlpha=(L.core/100)*.85*(1-t*.2);tc.drawImage(bC,0,0);
     }
     tc.globalAlpha=1;
@@ -215,8 +215,7 @@ function drawBlob(oc,L,cw,ch){
     const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;const bctx=bf.getContext('2d');
     bctx.drawImage(tmp,pad,pad);
     if(_fSupp){const t=document.createElement('canvas');t.width=bw;t.height=bw;const tc=t.getContext('2d');tc.filter=`blur(${blurPx}px)`;tc.drawImage(bf,0,0);bctx.clearRect(0,0,bw,bw);bctx.drawImage(t,0,0);}
-    else{_swBlur(bctx,bw,bw,Math.max(1,Math.round(blurPx*0.42)));}
-    bctx.drawImage(tmp,pad,pad); // núcleo nítido por cima para preservar brilho
+    else{_swBlur(bctx,bw,bw,Math.max(1,Math.round(blurPx)));}
     oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
   } else oc.drawImage(tmp,cx-tS/2,cy-tS/2,tS,tS);
 }
@@ -247,7 +246,7 @@ function drawRing(oc,L,cw,ch){
   rc.fillStyle=grad;rc.fillRect(0,0,tS,tS);rc.globalCompositeOperation='destination-in';rc.drawImage(oC,0,0);
   const pad=Math.ceil(blurPx*2);const bw=tS+pad*2;const bf=document.createElement('canvas');bf.width=bw;bf.height=bw;const bctxR=bf.getContext('2d');bctxR.drawImage(rf,pad,pad);
   if(_fSupp){const t=document.createElement('canvas');t.width=bw;t.height=bw;const tc=t.getContext('2d');tc.filter=`blur(${blurPx}px)`;tc.drawImage(bf,0,0);bctxR.clearRect(0,0,bw,bw);bctxR.drawImage(t,0,0);}
-  else{_swBlur(bctxR,bw,bw,Math.max(1,Math.round(blurPx*0.42)));}
+  else{_swBlur(bctxR,bw,bw,Math.max(1,Math.round(blurPx)));}
   oc.drawImage(bf,cx-tS/2-pad,cy-tS/2-pad,bw,bw);
 }
 
@@ -366,7 +365,7 @@ function applyExtrude(oc,L,cw,ch,drawFn){
       const blurPx=L.blur*Math.min(cw,ch)/300;
       const bf=document.createElement('canvas');bf.width=cw;bf.height=ch;const bfc=bf.getContext('2d');
       if(_fSupp){bfc.filter=`blur(${blurPx}px)`;bfc.drawImage(offC,0,0);}
-      else{bfc.drawImage(offC,0,0);_swBlur(bfc,cw,ch,Math.max(1,Math.round(blurPx*0.42)));}
+      else{bfc.drawImage(offC,0,0);_swBlur(bfc,cw,ch,Math.max(1,Math.round(blurPx)));}
       ec.globalAlpha=layerAlpha;ec.drawImage(bf,0,0);
     } else {
       ec.globalAlpha=layerAlpha;ec.drawImage(offC,0,0);
@@ -896,7 +895,7 @@ function drawLayerToCanvas(L,cw,ch){
     const blurPx=L.blur*Math.min(cw,ch)/300;
     const oc2=off.getContext('2d');
     if(_fSupp){const blurred=document.createElement('canvas');blurred.width=cw;blurred.height=ch;blurred.getContext('2d').filter=`blur(${blurPx}px)`;blurred.getContext('2d').drawImage(off,0,0);oc2.clearRect(0,0,cw,ch);oc2.drawImage(blurred,0,0);}
-    else{_swBlur(oc2,cw,ch,Math.max(1,Math.round(blurPx*0.42)));}
+    else{_swBlur(oc2,cw,ch,Math.max(1,Math.round(blurPx)));}
   }
   // aplicar máscara de luminosidade se existir
   if(L._mask)applyLayerMask(off,L,cw,ch);

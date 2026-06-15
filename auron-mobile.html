@@ -865,7 +865,7 @@ function build(){
   Object.entries(SHAPE_LIST).forEach(([s,n])=>{const b=document.createElement('button');b.className='chip';b.dataset.s=s;b.textContent=n;b.onclick=()=>setShape(s);sh.appendChild(b);});
   wireEdit();
 }
-const BUILD='v4';
+const BUILD='v5';
 window.addEventListener('load',()=>{
   build();
   // carimbo de versão + modo de blur (sw = software blur ativo p/ iOS antigo)
