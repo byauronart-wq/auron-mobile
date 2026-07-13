@@ -186,7 +186,7 @@ function drawBlob(oc,L,cw,ch){
     const softPx=Math.max(1,(L.ringsSoft||6)*Math.min(cw,ch)/600);
     for(let i=n;i>=0;i--){
       const t=i/n;const ringR=baseR*(.08+.92*t);if(ringR<1)continue;
-      const ct=invert?1-t:t;const[r,g,b]=interpColor(L.colors,ct);
+      const ct=invert?t:1-t;const[r,g,b]=interpColor(L.colors,ct);
       const rC=document.createElement('canvas');rC.width=tS;rC.height=tS;const rc=rC.getContext('2d');
       rc.save();rc.translate(hc,hc);rc.rotate(L.rotate*Math.PI/180);rc.transform(1,L.skewY/100,L.skewX/100,1,0,0);
       rc.scale(ringR*sN*ax,ringR*sN*ay);drawSP(rc,pts);rc.restore();rc.fillStyle=`rgb(${cl(r)},${cl(g)},${cl(b)})`;rc.fill();

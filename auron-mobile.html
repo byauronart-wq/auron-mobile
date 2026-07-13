@@ -817,7 +817,7 @@ async function doExport(){
 
 // ═══ SAVE / LOAD .auron v10 ═══
 function saveProject(){
-  const data={version:10,W,H,panelShape,themes:[],ZOOM:1,bleed:+el('expBleed').value||3,safe:5,product:CURRENT_PRODUCT,
+  const data={version:11,W,H,panelShape,themes:[],ZOOM:1,bleed:+el('expBleed').value||3,safe:5,product:CURRENT_PRODUCT,
     global:{bgCol:el('bgCol').value,bgOp:100,bgTr:el('bgTr').value,gBr:el('gBr').value,gSat:el('gSat').value,gNoise:el('gNoise').value,gVig:el('gVig').value,gCon:el('gCon').value,gBP:el('gBP').value,gWP:el('gWP').value,gVib:el('gVib').value,gTemp:el('gTemp').value},
     layers:layers.map(L=>{const c={...L,warpData:L.warpData?Array.from(L.warpData):null,displaceTargets:[...L.displaceTargets]};delete c._img;delete c._mask;return c;})};
   const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
@@ -842,6 +842,11 @@ function loadProject(input){
       }
       soloId=null;updateSoloHint();
       layers=(d.layers||[]).map(l=>({...l,colors:[...(l.colors||['#ffffff'])],displaceTargets:[...(l.displaceTargets||[])],warpData:l.warpData?new Float32Array(l.warpData):null}));
+      // compat v<11: mapeamento de cores do modo Anéis corrigido (centro↔borda) —
+      // trocar gradDir preserva o aspecto original de ficheiros antigos
+      if((d.version||9)<11)layers.forEach(L=>{
+        if(L.ringsMode&&(L.gradDir==='in-out'||L.gradDir==='out-in'))L.gradDir=L.gradDir==='in-out'?'out-in':'in-out';
+      });
       rehydrateImages();
       uid=Math.max(0,...layers.map(l=>l.id))+1;
       activeId=layers[layers.length-1]?.id??null;

@@ -1,6 +1,6 @@
 // Auron Mobile — service worker
 // network-first para TUDO (online = sempre a versão mais recente; offline = cache)
-const CACHE = 'auron-mobile-v5';
+const CACHE = 'auron-mobile-v6';
 const ASSETS = [
   './auron-mobile.html',
   './engine.js',
